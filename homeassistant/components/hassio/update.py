@@ -163,7 +163,7 @@ class SupervisorOSUpdateEntity(HassioOSEntity, UpdateEntity):
         | UpdateEntityFeature.SPECIFIC_VERSION
         | UpdateEntityFeature.BACKUP
     )
-    _attr_title = "Home Assistant Operating System"
+    _attr_title = "Smartelligent Operating System"
 
     @property
     def latest_version(self) -> str:
@@ -201,7 +201,7 @@ class SupervisorSupervisorUpdateEntity(HassioSupervisorEntity, UpdateEntity):
     """Update entity to handle updates for the Home Assistant Supervisor."""
 
     _attr_supported_features = UpdateEntityFeature.INSTALL
-    _attr_title = "Home Assistant Supervisor"
+    _attr_title = "Smartelligent Supervisor"
 
     @property
     def latest_version(self) -> str:
@@ -251,7 +251,7 @@ class SupervisorCoreUpdateEntity(HassioCoreEntity, UpdateEntity):
         | UpdateEntityFeature.SPECIFIC_VERSION
         | UpdateEntityFeature.BACKUP
     )
-    _attr_title = "Home Assistant Core"
+    _attr_title = "Smartelligent Core"
 
     @property
     def latest_version(self) -> str:
